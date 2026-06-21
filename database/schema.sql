@@ -80,7 +80,7 @@ CREATE TABLE public.credit_cards (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     family_id UUID REFERENCES public.families(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    limit DECIMAL(15, 2) NOT NULL,
+    "limit" DECIMAL(15, 2) NOT NULL,
     best_day_to_buy INTEGER CHECK (best_day_to_buy BETWEEN 1 AND 31),
     due_day INTEGER CHECK (due_day BETWEEN 1 AND 31),
     color TEXT DEFAULT '#8B5CF6',
