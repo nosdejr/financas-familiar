@@ -20,15 +20,24 @@ export function useAuth() {
 
     // Create user profile in public.users table
     if (data.user) {
-      const { error: profileError } = await supabase
+      // Check if profile already exists
+      const { data: existingProfile } = await supabase
         .from('users')
-        .insert({
-          id: data.user.id,
-          email: data.user.email!,
-          full_name: fullName,
-        })
+        .select('id')
+        .eq('id', data.user.id)
+        .single()
 
-      if (profileError) throw profileError
+      if (!existingProfile) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: fullName,
+          })
+
+        if (profileError) throw profileError
+      }
     }
 
     return data
@@ -41,6 +50,27 @@ export function useAuth() {
     })
 
     if (error) throw error
+
+    // Create user profile if it doesn't exist
+    if (data.user) {
+      const { data: existingProfile } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!existingProfile) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: data.user.user_metadata?.full_name || email.split('@')[0],
+          })
+
+        if (profileError) console.error('Error creating profile:', profileError)
+      }
+    }
 
     return data
   }
