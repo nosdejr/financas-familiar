@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,47 +19,85 @@ import {
   PieChart,
   BarChart3,
   Moon,
-  Sun
+  Sun,
+  Loader2
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
+import { useFamilies } from "@/hooks/use-families"
+import { useAccounts } from "@/hooks/use-accounts"
+import { useTransactions } from "@/hooks/use-transactions"
+import { useGoals } from "@/hooks/use-goals"
+import { useCreditCards } from "@/hooks/use-credit-cards"
+import { useAuth } from "@/lib/auth"
 
 export function Dashboard() {
-  const [isMobile, setIsMobile] = useState(false)
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const { getUser } = useAuth()
+  const { currentFamily, loading: familyLoading } = useFamilies()
+  const { accounts, loading: accountsLoading, getTotalBalance } = useAccounts(currentFamily?.id)
+  const { transactions, loading: transactionsLoading, getTotalIncome, getTotalExpenses } = useTransactions(currentFamily?.id)
+  const { goals, loading: goalsLoading, getProgress } = useGoals(currentFamily?.id)
+  const { creditCards, loading: creditCardsLoading } = useCreditCards(currentFamily?.id)
   const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     setMounted(true)
+    checkAuth()
   }, [])
+
+  const checkAuth = async () => {
+    try {
+      const currentUser = await getUser()
+      if (!currentUser) {
+        router.push("/login")
+      } else {
+        setUser(currentUser)
+      }
+    } catch (error) {
+      router.push("/login")
+    }
+  }
 
   if (!mounted) {
     return null
   }
 
-  // Mock data - will be replaced with real data from Supabase
-  const mockData = {
-    totalBalance: 45230.50,
-    income: 12500.00,
-    expenses: 8750.00,
-    savings: 3750.00,
-    netWorth: 125000.00,
-    recentTransactions: [
-      { id: 1, description: "Salário", amount: 8500.00, type: "income", category: "Salário", date: "2024-01-15" },
-      { id: 2, description: "Supermercado", amount: 450.00, type: "expense", category: "Alimentação", date: "2024-01-14" },
-      { id: 3, description: "Netflix", amount: 55.90, type: "expense", category: "Lazer", date: "2024-01-13" },
-      { id: 4, description: "Freelance", amount: 4000.00, type: "income", category: "Freelance", date: "2024-01-12" },
-      { id: 5, description: "Uber", amount: 35.00, type: "expense", category: "Transporte", date: "2024-01-11" },
-    ],
-    goals: [
-      { id: 1, name: "Viagem Europa", target: 30000, current: 15000, icon: "✈️" },
-      { id: 2, name: "Reserva Emergência", target: 50000, current: 35000, icon: "🏦" },
-      { id: 3, name: "Carro Novo", target: 80000, current: 25000, icon: "🚗" },
-    ],
-    creditCards: [
-      { id: 1, name: "Nubank", limit: 10000, used: 3500, dueDay: 10 },
-      { id: 2, name: "Itau", limit: 15000, used: 5200, dueDay: 15 },
-    ]
+  const loading = familyLoading || accountsLoading || transactionsLoading || goalsLoading || creditCardsLoading
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    )
   }
+
+  if (!currentFamily) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Bem-vindo ao FinanceFlow</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              Você ainda não tem uma família configurada. Crie uma para começar a controlar suas finanças.
+            </p>
+            <Button className="w-full" onClick={() => router.push("/settings")}>
+              Criar Família
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const totalBalance = getTotalBalance()
+  const income = getTotalIncome()
+  const expenses = getTotalExpenses()
+  const savings = income - expenses
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
@@ -146,7 +185,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(mockData.totalBalance)}</span>
+                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(totalBalance)}</span>
                 <Wallet className="w-8 h-8 opacity-80" />
               </div>
             </CardContent>
@@ -158,7 +197,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(mockData.income)}</span>
+                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(income)}</span>
                 <TrendingUp className="w-8 h-8 opacity-80" />
               </div>
             </CardContent>
@@ -182,7 +221,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(mockData.savings)}</span>
+                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(savings)}</span>
                 <PiggyBank className="w-8 h-8 opacity-80" />
               </div>
             </CardContent>
@@ -220,7 +259,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockData.recentTransactions.map((transaction) => (
+                {transactions.slice(0, 5).map((transaction: any) => (
                   <div key={transaction.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -236,7 +275,7 @@ export function Dashboard() {
                       </div>
                       <div>
                         <p className="font-medium">{transaction.description}</p>
-                        <p className="text-sm text-slate-500">{transaction.category}</p>
+                        <p className="text-sm text-slate-500">{transaction.date}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -245,10 +284,12 @@ export function Dashboard() {
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                       </p>
-                      <p className="text-xs text-slate-500">{transaction.date}</p>
                     </div>
                   </div>
                 ))}
+                {transactions.length === 0 && (
+                  <p className="text-center text-slate-500 py-8">Nenhuma transação encontrada</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -259,8 +300,8 @@ export function Dashboard() {
               <CardTitle>Metas Financeiras</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {mockData.goals.map((goal) => {
-                const progress = (goal.current / goal.target) * 100
+              {goals.map((goal: any) => {
+                const progress = getProgress(goal)
                 return (
                   <div key={goal.id} className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -277,12 +318,15 @@ export function Dashboard() {
                       />
                     </div>
                     <div className="flex justify-between text-xs text-slate-500">
-                      <span>{formatCurrency(goal.current)}</span>
-                      <span>{formatCurrency(goal.target)}</span>
+                      <span>{formatCurrency(goal.current_amount)}</span>
+                      <span>{formatCurrency(goal.target_amount)}</span>
                     </div>
                   </div>
                 )
               })}
+              {goals.length === 0 && (
+                <p className="text-center text-slate-500 py-8">Nenhuma meta encontrada</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -294,8 +338,8 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-4">
-              {mockData.creditCards.map((card) => {
-                const usedPercent = (card.used / card.limit) * 100
+              {creditCards.map((card: any) => {
+                const usedPercent = 0 // Need to calculate from transactions
                 return (
                   <div key={card.id} className="p-4 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-lg">
                     <div className="flex items-center justify-between mb-4">
@@ -304,27 +348,20 @@ export function Dashboard() {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Fatura Atual</span>
-                        <span className="font-bold">{formatCurrency(card.used)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
                         <span className="text-slate-400">Limite</span>
                         <span>{formatCurrency(card.limit)}</span>
                       </div>
-                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden mt-2">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                          style={{ width: `${usedPercent}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-slate-400 mt-1">
-                        <span>Vencimento: dia {card.dueDay}</span>
-                        <span>{usedPercent.toFixed(0)}% usado</span>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-400">Vencimento</span>
+                        <span>dia {card.due_day}</span>
                       </div>
                     </div>
                   </div>
                 )
               })}
+              {creditCards.length === 0 && (
+                <p className="text-center text-slate-500 py-8 col-span-2">Nenhum cartão encontrado</p>
+              )}
             </div>
           </CardContent>
         </Card>
