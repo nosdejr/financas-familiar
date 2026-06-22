@@ -64,9 +64,8 @@ export function Dashboard() {
     return null
   }
 
-  const loading = familyLoading || accountsLoading || transactionsLoading || goalsLoading || creditCardsLoading
-
-  if (loading) {
+  // Only show loading for family loading, other hooks can load in background
+  if (familyLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
