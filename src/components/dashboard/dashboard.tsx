@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
   PiggyBank,
   ArrowUpRight,
   ArrowDownRight,
@@ -15,12 +16,24 @@ import {
   CreditCard,
   Target,
   PieChart,
-  BarChart3
+  BarChart3,
+  Moon,
+  Sun
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 export function Dashboard() {
   const [isMobile, setIsMobile] = useState(false)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   // Mock data - will be replaced with real data from Supabase
   const mockData = {
@@ -80,8 +93,17 @@ export function Dashboard() {
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="w-full justify-start gap-3"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {theme === "dark" ? "Modo Claro" : "Modo Escuro"}
+          </Button>
+          <div className="flex items-center gap-3 pt-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
               JD
             </div>
@@ -100,11 +122,20 @@ export function Dashboard() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             FinanceFlow
           </h1>
-          <Button variant="ghost" size="icon">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
-              JD
-            </div>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+            <Button variant="ghost" size="icon">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
+                JD
+              </div>
+            </Button>
+          </div>
         </div>
 
         {/* Quick Stats */}
