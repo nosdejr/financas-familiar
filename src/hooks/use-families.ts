@@ -40,7 +40,24 @@ export function useFamilies() {
         return
       }
 
-      // Get families where user is a member
+      // Try to get families where user is admin first (simpler query)
+      const { data: adminFamilies, error: adminError } = await supabase
+        .from('families')
+        .select('*')
+        .eq('admin_id', user.id)
+
+      if (adminError) {
+        console.error('Error fetching admin families:', adminError)
+      }
+
+      if (adminFamilies && adminFamilies.length > 0) {
+        setFamilies(adminFamilies)
+        setCurrentFamily(adminFamilies[0])
+        setLoading(false)
+        return
+      }
+
+      // If no admin families, try to get families where user is a member
       const { data: memberData, error: memberError } = await supabase
         .from('family_members')
         .select('family_id')
