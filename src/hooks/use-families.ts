@@ -46,7 +46,13 @@ export function useFamilies() {
         .select('family_id')
         .eq('user_id', user.id)
 
-      if (memberError) throw memberError
+      if (memberError) {
+        console.error('Error fetching family_members:', memberError)
+        setCurrentFamily(null)
+        setFamilies([])
+        setLoading(false)
+        return
+      }
 
       if (!memberData || memberData.length === 0) {
         setCurrentFamily(null)
@@ -62,12 +68,21 @@ export function useFamilies() {
         .select('*')
         .in('id', familyIds)
 
-      if (familiesError) throw familiesError
+      if (familiesError) {
+        console.error('Error fetching families:', familiesError)
+        setCurrentFamily(null)
+        setFamilies([])
+        setLoading(false)
+        return
+      }
 
       setFamilies(familiesData || [])
       setCurrentFamily(familiesData?.[0] || null)
     } catch (err) {
+      console.error('Error in fetchFamilies:', err)
       setError(err instanceof Error ? err.message : 'Error fetching families')
+      setCurrentFamily(null)
+      setFamilies([])
     } finally {
       setLoading(false)
     }
