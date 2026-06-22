@@ -210,14 +210,12 @@ CREATE POLICY "Admin can update family" ON public.families
 CREATE POLICY "Users can insert own family membership" ON public.family_members
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Family members can view members" ON public.family_members
-    FOR SELECT USING (
-        family_id IN (SELECT family_id FROM public.family_members WHERE user_id = auth.uid())
-    );
+CREATE POLICY "Users can view own family membership" ON public.family_members
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Admin can manage members" ON public.family_members
     FOR ALL USING (
-        family_id IN (SELECT family_id FROM public.family_members WHERE user_id = auth.uid() AND role = 'admin')
+        family_id IN (SELECT id FROM public.families WHERE admin_id = auth.uid())
     );
 
 -- Accounts policies
