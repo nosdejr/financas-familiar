@@ -154,7 +154,7 @@ export function Dashboard() {
               JD
             </div>
             <div>
-              <p className="font-medium text-sm">João Silva</p>
+              <p className="font-medium text-sm">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário'}</p>
               <p className="text-xs text-slate-500">Administrador</p>
             </div>
           </div>
