@@ -76,7 +76,7 @@ export function useBudgets(familyId?: string) {
 
       const { data, error } = await supabase
         .from('budgets')
-        .insert({ ...budget, family_id })
+        .insert({ ...budget, family_id: familyId })
         .select()
         .single()
 

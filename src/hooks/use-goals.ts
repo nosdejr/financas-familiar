@@ -57,7 +57,7 @@ export function useGoals(familyId?: string) {
 
       const { data, error } = await supabase
         .from('goals')
-        .insert({ ...goal, family_id })
+        .insert({ ...goal, family_id: familyId })
         .select()
         .single()
 

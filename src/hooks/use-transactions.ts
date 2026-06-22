@@ -148,7 +148,7 @@ export function useTransactions(familyId?: string) {
 
       const { data, error } = await supabase
         .from('categories')
-        .insert({ ...category, family_id })
+        .insert({ ...category, family_id: familyId })
         .select()
         .single()
 

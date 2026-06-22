@@ -57,7 +57,7 @@ export function useCreditCards(familyId?: string) {
 
       const { data, error } = await supabase
         .from('credit_cards')
-        .insert({ ...card, family_id })
+        .insert({ ...card, family_id: familyId })
         .select()
         .single()
 

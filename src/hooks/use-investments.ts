@@ -56,7 +56,7 @@ export function useInvestments(familyId?: string) {
 
       const { data, error } = await supabase
         .from('investments')
-        .insert({ ...investment, family_id })
+        .insert({ ...investment, family_id: familyId })
         .select()
         .single()
 
