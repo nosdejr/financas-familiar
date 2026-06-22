@@ -1,0 +1,11 @@
+{
+  "build": {
+    "command": "npm run build",
+    "cwd": "."
+  },
+  "build_output_directory": ".next",
+  "compatibility_flags": ["nodejs_compat"],
+  "environment_variables": {
+    "NODE_VERSION": "18"
+  }
+}
