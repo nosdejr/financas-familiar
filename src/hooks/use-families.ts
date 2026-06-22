@@ -30,10 +30,14 @@ export function useFamilies() {
 
   const fetchFamilies = async () => {
     try {
+      console.log('fetchFamilies: Starting')
       setLoading(true)
       const { data: { user } } = await supabase.auth.getUser()
 
+      console.log('fetchFamilies: User:', user)
+
       if (!user) {
+        console.log('fetchFamilies: No user found')
         setCurrentFamily(null)
         setFamilies([])
         setLoading(false)
@@ -41,16 +45,20 @@ export function useFamilies() {
       }
 
       // Try to get families where user is admin first (simpler query)
+      console.log('fetchFamilies: Fetching admin families')
       const { data: adminFamilies, error: adminError } = await supabase
         .from('families')
         .select('*')
         .eq('admin_id', user.id)
+
+      console.log('fetchFamilies: Admin families:', adminFamilies, 'Error:', adminError)
 
       if (adminError) {
         console.error('Error fetching admin families:', adminError)
       }
 
       if (adminFamilies && adminFamilies.length > 0) {
+        console.log('fetchFamilies: Found admin families')
         setFamilies(adminFamilies)
         setCurrentFamily(adminFamilies[0])
         setLoading(false)
@@ -58,10 +66,13 @@ export function useFamilies() {
       }
 
       // If no admin families, try to get families where user is a member
+      console.log('fetchFamilies: Fetching family members')
       const { data: memberData, error: memberError } = await supabase
         .from('family_members')
         .select('family_id')
         .eq('user_id', user.id)
+
+      console.log('fetchFamilies: Member data:', memberData, 'Error:', memberError)
 
       if (memberError) {
         console.error('Error fetching family_members:', memberError)
@@ -72,6 +83,7 @@ export function useFamilies() {
       }
 
       if (!memberData || memberData.length === 0) {
+        console.log('fetchFamilies: No family members found')
         setCurrentFamily(null)
         setFamilies([])
         setLoading(false)
@@ -80,10 +92,13 @@ export function useFamilies() {
 
       const familyIds = memberData.map(m => m.family_id)
 
+      console.log('fetchFamilies: Fetching families by IDs:', familyIds)
       const { data: familiesData, error: familiesError } = await supabase
         .from('families')
         .select('*')
         .in('id', familyIds)
+
+      console.log('fetchFamilies: Families data:', familiesData, 'Error:', familiesError)
 
       if (familiesError) {
         console.error('Error fetching families:', familiesError)
@@ -95,12 +110,14 @@ export function useFamilies() {
 
       setFamilies(familiesData || [])
       setCurrentFamily(familiesData?.[0] || null)
+      console.log('fetchFamilies: Completed successfully')
     } catch (err) {
       console.error('Error in fetchFamilies:', err)
       setError(err instanceof Error ? err.message : 'Error fetching families')
       setCurrentFamily(null)
       setFamilies([])
     } finally {
+      console.log('fetchFamilies: Setting loading to false')
       setLoading(false)
     }
   }
