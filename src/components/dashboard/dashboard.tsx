@@ -209,7 +209,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(mockData.expenses)}</span>
+                <span className="text-2xl lg:text-3xl font-bold">{formatCurrency(expenses)}</span>
                 <TrendingDown className="w-8 h-8 opacity-80" />
               </div>
             </CardContent>
