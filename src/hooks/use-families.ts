@@ -36,6 +36,7 @@ export function useFamilies() {
       if (!user) {
         setCurrentFamily(null)
         setFamilies([])
+        setLoading(false)
         return
       }
 
@@ -50,6 +51,7 @@ export function useFamilies() {
       if (!memberData || memberData.length === 0) {
         setCurrentFamily(null)
         setFamilies([])
+        setLoading(false)
         return
       }
 
