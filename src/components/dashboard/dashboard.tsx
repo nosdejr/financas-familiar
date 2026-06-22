@@ -34,7 +34,7 @@ export function Dashboard() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const { getUser } = useAuth()
-  const { currentFamily, loading: familyLoading } = useFamilies()
+  const { currentFamily, loading: familyLoading, createFamily } = useFamilies()
   const { accounts, loading: accountsLoading, getTotalBalance } = useAccounts(currentFamily?.id)
   const { transactions, loading: transactionsLoading, getTotalIncome, getTotalExpenses } = useTransactions(currentFamily?.id)
   const { goals, loading: goalsLoading, getProgress } = useGoals(currentFamily?.id)
@@ -84,7 +84,15 @@ export function Dashboard() {
             <p className="text-slate-600 dark:text-slate-400 mb-4">
               Você ainda não tem uma família configurada. Crie uma para começar a controlar suas finanças.
             </p>
-            <Button className="w-full" onClick={() => router.push("/settings")}>
+            <Button className="w-full" onClick={async () => {
+              try {
+                const fullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário'
+                const familyName = `Família de ${fullName}`
+                await createFamily(familyName)
+              } catch (error) {
+                console.error('Error creating family:', error)
+              }
+            }}>
               Criar Família
             </Button>
           </CardContent>
