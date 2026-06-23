@@ -20,7 +20,8 @@ import {
   BarChart3,
   Moon,
   Sun,
-  Loader2
+  Loader2,
+  Settings
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { useFamilies } from "@/hooks/use-families"
@@ -117,17 +118,19 @@ export function Dashboard() {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {[
-            { icon: PieChart, label: "Dashboard", active: true },
-            { icon: ArrowUpRight, label: "Transações", active: false },
-            { icon: Wallet, label: "Contas", active: false },
-            { icon: CreditCard, label: "Cartões", active: false },
-            { icon: Target, label: "Metas", active: false },
-            { icon: BarChart3, label: "Orçamento", active: false },
-            { icon: TrendingUp, label: "Investimentos", active: false },
-            { icon: PieChart, label: "Relatórios", active: false },
+            { icon: PieChart, label: "Dashboard", active: true, href: "/" },
+            { icon: ArrowUpRight, label: "Transações", active: false, href: "/transactions" },
+            { icon: Wallet, label: "Contas", active: false, href: "/accounts" },
+            { icon: CreditCard, label: "Cartões", active: false, href: "/credit-cards" },
+            { icon: Target, label: "Metas", active: false, href: "/goals" },
+            { icon: BarChart3, label: "Orçamento", active: false, href: "/budget" },
+            { icon: TrendingUp, label: "Investimentos", active: false, href: "/investments" },
+            { icon: PieChart, label: "Relatórios", active: false, href: "/reports" },
+            { icon: Settings, label: "Configurações", active: false, href: "/settings" },
           ].map((item) => (
             <button
               key={item.label}
+              onClick={() => router.push(item.href)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 item.active
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
@@ -377,14 +380,15 @@ export function Dashboard() {
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-2">
           <div className="flex justify-around">
             {[
-              { icon: PieChart, label: "Início", active: true },
-              { icon: ArrowUpRight, label: "Transações", active: false },
-              { icon: CreditCard, label: "Cartões", active: false },
-              { icon: Target, label: "Metas", active: false },
-              { icon: Wallet, label: "Perfil", active: false },
+              { icon: PieChart, label: "Início", active: true, href: "/" },
+              { icon: ArrowUpRight, label: "Transações", active: false, href: "/transactions" },
+              { icon: CreditCard, label: "Cartões", active: false, href: "/credit-cards" },
+              { icon: Target, label: "Metas", active: false, href: "/goals" },
+              { icon: Settings, label: "Config", active: false, href: "/settings" },
             ].map((item) => (
               <button
                 key={item.label}
+                onClick={() => router.push(item.href)}
                 className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                   item.active
                     ? "text-blue-600 dark:text-blue-400"
