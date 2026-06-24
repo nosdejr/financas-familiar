@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Target, Plus, Trash2 } from "lucide-react"
+import { Target, Plus, Trash2, Loader2 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { useGoals } from "@/hooks/use-goals"
 import { useFamilies } from "@/hooks/use-families"
+import { AppLayout } from "@/components/layout/app-layout"
 
 export default function GoalsPage() {
   const { currentFamily } = useFamilies()
@@ -52,14 +53,16 @@ export default function GoalsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      </AppLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 lg:p-8">
+    <AppLayout>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Metas Financeiras</h1>
@@ -183,6 +186,6 @@ export default function GoalsPage() {
           )}
         </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }

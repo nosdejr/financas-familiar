@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Settings, LogOut, User, Users } from "lucide-react"
 import { useFamilies } from "@/hooks/use-families"
 import { supabase } from "@/lib/supabase"
+import { AppLayout } from "@/components/layout/app-layout"
 
 export default function SettingsPage() {
   const { currentFamily, families, createFamily } = useFamilies()
@@ -31,7 +32,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 lg:p-8">
+    <AppLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
           <Settings className="w-8 h-8" />
@@ -113,6 +114,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AppLayout>
   )
 }
